@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: web
+    ports:
+      - 3000:3000
+    volumes:
+      - ./web:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    command: yarn dev
