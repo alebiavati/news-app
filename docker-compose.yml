@@ -17,6 +17,15 @@ services:
     environment:
       NEXTAUTH_URL: http://localhost:3000
 
+  newsapi:
+    build:
+      context: newsapi
+    ports:
+      - 3001:3000
+    volumes:
+      - ./newsapi:/usr/src/app
+      - /usr/src/app/node_modules
+
   db:
     image: postgres:12
     restart: always
@@ -33,6 +42,7 @@ services:
     depends_on:
       - db
       - keycloak
+      - newsapi
     volumes:
       - ./graphql/migrations:/hasura-migrations
       - ./graphql/metadata:/hasura-metadata
