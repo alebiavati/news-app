@@ -1,26 +1,21 @@
-import { useQuery, gql } from "@apollo/client";
-import { useSession } from "../../utils/auth";
-
-const BOOKMARKS = gql`
-  query GetBookmarks {
-    bookmarks {
-      id
-      title
-      url
-    }
-  }
-`;
+import { useQuery } from "@apollo/client";
+import { signIn, useSession } from "../../utils/auth";
+import { BOOKMARKS } from "../../store/queries";
 
 export default function Bookmarks({ className }) {
-  const handleChange = (event) => console.log(event.target.value);
-
-  const [session, _] = useSession();
+  const [session, loadingSession] = useSession();
   const { data } = useQuery(BOOKMARKS, { skip: !session });
 
   return (
     <div className={className}>
       <h4>Bookmarks:</h4>
-      {data && (
+      {!session && !loadingSession && (
+        <button onClick={() => signIn()}>Sign in to add bookmarks</button>
+      )}
+      {data && !data.bookmarks.length > 0 && (
+        <p>No bookmarks found, start searching to add bookmarks.</p>
+      )}
+      {data && data.bookmarks.length > 0 && (
         <ul>
           {data.bookmarks.map(({ id, title, url }) => (
             <li key={id}>

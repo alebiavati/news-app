@@ -26,7 +26,6 @@ const getKeycloakSession = () => {
     })
     .then((authenticated) => {
       if (authenticated) {
-        console.log(keycloak.idTokenParsed);
         return keycloak.idTokenParsed || false;
       } else {
         return false;

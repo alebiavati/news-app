@@ -1,25 +1,64 @@
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import groupBy from "lodash/groupBy";
+import { useSession } from "../../utils/auth";
+import { BOOKMARKS, ARTICLES } from "../../store/queries";
+import { ADD_BOOKMARK, REMOVE_BOOKMARK } from "../../store/mutations";
+import * as _ from "lodash";
+import moment from "moment";
 
-const ARTICLES = gql`
-  query GetArticles($query: String) {
-    articles(query: $query) {
-      source_name
-      source_id
-      title
-      url
-      section
-    }
-  }
-`;
+const BookmarkCheckbox = ({
+  source_name,
+  source_id,
+  title,
+  url,
+  publish_date,
+}) => {
+  const [session] = useSession();
+  const { data: bookmarksData } = useQuery(BOOKMARKS, { skip: !session });
+  const [addBookmark] = useMutation(ADD_BOOKMARK);
+  const [removeBookmark] = useMutation(REMOVE_BOOKMARK);
 
-const renderArticle = ({ source_name, source_id, title, url, section }) => (
-  <li key={`${source_name}${source_id}`}>
-    <a href={url}>{title}</a>
-  </li>
-);
+  return (
+    <>
+      {" - Bookmark?"}
+      <input
+        type="checkbox"
+        defaultChecked={
+          !!_.find(bookmarksData.bookmarks, {
+            source_name,
+            source_id,
+          })
+        }
+        onChange={(event) => {
+          if (event.target.checked) {
+            addBookmark({
+              variables: {
+                object: {
+                  source_name,
+                  source_id,
+                  title,
+                  url,
+                  publish_date,
+                },
+              },
+            });
+          } else {
+            removeBookmark({
+              variables: {
+                source_name,
+                source_id,
+              },
+            });
+          }
+        }}
+      />
+    </>
+  );
+};
 
 export default function SearchResults({ className, query }) {
+  const [session, loadingSession] = useSession();
+
   const { loading, error, data = {} } = useQuery(ARTICLES, {
     variables: { query },
     skip: !query,
@@ -33,9 +72,36 @@ export default function SearchResults({ className, query }) {
       {query && sections && (
         <ul>
           {Object.keys(sections).map((section) => (
-            <li>
+            <li key={section}>
               <strong>{section}</strong>
-              <ul>{sections[section].map(renderArticle)}</ul>
+              <ul>
+                {sections[section].map(
+                  ({ source_name, source_id, title, url, publish_date }) => (
+                    <li key={`${source_name}${source_id}`}>
+                      <em>
+                        <time dateTime={publish_date}>
+                          {moment(publish_date).format("DD/MM/YYYY")}
+                        </time>
+                      </em>
+                      {" - "}
+                      <a href={url} target="_blank">
+                        {title}
+                      </a>
+                      {session && !loadingSession && (
+                        <>
+                          <BookmarkCheckbox
+                            source_name={source_name}
+                            source_id={source_id}
+                            title={title}
+                            url={url}
+                            publish_date={publish_date}
+                          />
+                        </>
+                      )}
+                    </li>
+                  )
+                )}
+              </ul>
             </li>
           ))}
         </ul>

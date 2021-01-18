@@ -9,10 +9,16 @@ const httpLink = createHttpLink({
 const authLink = setContext((_, { headers }) => {
   const token = getSession();
 
+  const authHeaders = token
+    ? {
+        authorization: `Bearer ${token}`,
+      }
+    : {};
+
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      ...authHeaders,
     },
   };
 });
