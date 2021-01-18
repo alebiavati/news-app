@@ -1,2 +1,18 @@
+type Query {
+  articles (
+    query: String!
+  ): [Article]
+}
 
+
+
+
+type Article {
+  source_name : String!
+  source_id : String!
+  title : String!
+  url : String!
+  section : String!
+  publish_date : String!
+}
 

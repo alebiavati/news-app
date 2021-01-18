@@ -25,6 +25,10 @@ services:
     volumes:
       - ./newsapi:/usr/src/app
       - /usr/src/app/node_modules
+    command: yarn start:dev
+    environment:
+      - GUARDIAN_API_KEY=${GUARDIAN_API_KEY:-151b6ef6-267a-48e3-ac43-b7d9102f4706}
+      - NEWSAPI_API_KEY=${NEWSAPI_API_KEY:-cb7a160eba474d2387e86e06ddc36791}
 
   db:
     image: postgres:12
@@ -51,6 +55,7 @@ services:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: admin
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
       HASURA_GRAPHQL_JWT_SECRET: |
         {
           "jwk_url": "http://keycloak:8080/auth/realms/news-app/protocol/openid-connect/certs",

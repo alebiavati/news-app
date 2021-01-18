@@ -1,6 +1,14 @@
-actions: []
+actions:
+- name: articles
+  definition:
+    kind: ""
+    handler: http://newsapi:3000/news/
+  permissions:
+  - role: public
+  - role: user
 custom_types:
   enums: []
   input_objects: []
-  objects: []
+  objects:
+  - name: Article
   scalars: []
