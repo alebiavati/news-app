@@ -11,7 +11,7 @@ export class NewsService {
   search(query): Promise<News[]> {
     return Promise.all([
       this.guardianService.search(query),
-      this.newsapiService.search(query),
+      // this.newsapiService.search(query),
     ]).then(_.flatten);
   }
 }

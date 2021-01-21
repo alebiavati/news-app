@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import groupBy from "lodash/groupBy";
 import { useSession } from "../../utils/auth";
@@ -56,12 +57,31 @@ const BookmarkCheckbox = ({
   );
 };
 
+const useDebounce = () => {};
+
 export default function SearchResults({ className, query }) {
   const [session, loadingSession] = useSession();
 
+  const [debounceQuery, setDebouncedQuery] = useState(query);
+
+  let timeout = null;
+  useEffect(() => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [query]);
+
   const { loading, error, data = {} } = useQuery(ARTICLES, {
-    variables: { query },
-    skip: !query,
+    variables: { query: debounceQuery },
+    skip: !debounceQuery,
   });
 
   const sections = groupBy(data.articles || [], ({ section }) => section);
@@ -69,7 +89,8 @@ export default function SearchResults({ className, query }) {
   return (
     <div className={className}>
       <h4>Search results:</h4>
-      {query && sections && (
+      {query && (loading || query !== debounceQuery) && <p>Loading...</p>}
+      {debounceQuery && !loading && sections && (
         <ul>
           {Object.keys(sections).map((section) => (
             <li key={section}>

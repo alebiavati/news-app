@@ -7,7 +7,9 @@ import Bookmarks from "../bookmarks";
 
 export default function News({ className }) {
   const [searchQuery, setSearchQuery] = useState();
-  const handleSearch = (event) => setSearchQuery(event.target.value);
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <div className={className}>
