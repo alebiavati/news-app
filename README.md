@@ -14,3 +14,7 @@ docker-compose up -d
 ```
 
 Then visit [http://localhost:3000](http://localhost:3000)
+
+## Architecture
+
+![Architecture](images/architecture.png)
